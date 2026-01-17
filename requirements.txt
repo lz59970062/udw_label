@@ -1,0 +1,4 @@
+setproctitle
+openai
+pyyaml
+pillow
