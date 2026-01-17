@@ -23,20 +23,18 @@ def get_descriptions(good_img_path, bad_img_path):
     bad_b64 = encode_image(bad_img_path)
     
     prompt = (
-        "You are an elite expert in underwater optics, computer vision, and artistic photography analysis. "
-        "I am providing two images for a comparative study: "
-        "Image A is the reference (high quality/clean), and Image B is the degraded version (underwater environment artifacts).\n\n"
-        "Please provide an extremely detailed, technical, and descriptive analysis for two scenarios:\n\n"
-        "1. 'a2b' (Degradation Process): Describe the physical and perceptual transformation from A to B. "
-        "Discuss global factors like hydrodynamic haze, light absorption (loss of red/long-wavelength light), backscattering (marine snow), and contrast attenuation. "
-        "Analyze local changes such as the blurring of edge gradients on specific objects, loss of micro-textures, and the introduction of chromatic noise in shadow regions.\n\n"
-        "2. 'b2a' (Restoration/Enhancement): Describe the restorative process required to transform B back into A. "
-        "Detail the removal of color casts (e.g., 'de-greening' or 'de-blueing'), the recovery of the dark channel, and the reconstruction of high-frequency details. "
-        "Mention how structural integrity is regained and how the dynamic range is expanded to reveal hidden details in previously obscured areas.\n\n"
+        "You are a visual effects expert. Compare a clear underwater image (Image A) and its degraded version (Image B).\n\n"
+        "Provide two descriptive 'instructions' or 'narratives' using plain, sensory language. Avoid technical jargon like 'Dark Channel Prior', 'histogram', or 'Wiener filter'. "
+        "Do NOT use terms 'Image A' or 'Image B' in the final descriptions; refer to the actual content (e.g., 'the sea turtle', 'the corals', 'the water').\n\n"
+        "1. 'degradation': Describe the 'methods' to degrade the clear scene so it matches the degraded one. "
+        "Example: 'Wrap the entire scene in a heavy, greenish fog that obscures the distant reef. Blur the fine textures on the turtle's shell and significantly dim the overall lighting to make it look murky.'\n\n"
+        "2. 'enhancement': Describe the 'methods' to restore the degraded scene to its original clarity. "
+        "Example: 'Strip away the thick cyan color cast to reveal the natural colors of the coral. Sharpen the blurred edges of the sea turtle and clear up the hazy water to bring out the hidden details in the background.'\n\n"
         "Requirements:\n"
-        "- Use professional and descriptive language suitable for training Large Multimodal Models (LMMs).\n"
-        "- Ensure descriptions are cohesive, focusing on the causal relationship between the two images.\n"
-        "- Format your response as a valid JSON object with keys 'a2b' and 'b2a'."
+        "- The tone should be descriptive and action-oriented (what needs to change/what happened).\n"
+        "- Each description must be a self-contained, stand-alone observation. Strictly avoid any comparative language like 'than the other image', 'more than the reference', or mentioning that a comparison is taking place.\n"
+        "- Focus on visual quality: color, clarity, contrast, and detail.\n"
+        "- Format as a JSON object with keys 'degradation' and 'enhancement'."
     )
 
     try:
@@ -58,7 +56,7 @@ def get_descriptions(good_img_path, bad_img_path):
         return json.loads(content)
     except Exception as e:
         print(f"Error processing {good_img_path} and {bad_img_path}: {e}")
-        return {"a2b": None, "b2a": None}
+        return {"degradation": None, "enhancement": None}
 
 def main():
     with open(YAML_PATH, 'r') as f:
@@ -75,8 +73,8 @@ def main():
         good_path = os.path.join(IMAGE_ROOT, pair['good'])
         
         for bad_entry in pair['bads']:
-            # 跳过已经处理过的（可选）
-            if 'a2b_desc' in bad_entry and bad_entry['a2b_desc']:
+            # 跳过已经处理过的
+            if 'enhancement' in bad_entry and bad_entry['enhancement']:
                 continue
                 
             bad_path = os.path.join(IMAGE_ROOT, bad_entry['file'])
@@ -85,8 +83,8 @@ def main():
             res = get_descriptions(good_path, bad_path)
             
             # 新增字段保存
-            bad_entry['a2b_desc'] = res.get('a2b')
-            bad_entry['b2a_desc'] = res.get('b2a')
+            bad_entry['degradation'] = res.get('degradation')
+            bad_entry['enhancement'] = res.get('enhancement')
 
         # 每处理 10 个保存一次，防止长时间运行中断
         if (i + 1) % 10 == 0:
