@@ -9,7 +9,7 @@ import json
 API_KEY = "EMPTY"
 BASE_URL = "http://localhost:8000/v1"
 MODEL_NAME = "Qwen/Qwen3-VL-30B-A3B-Instruct"
-YAML_PATH = "/home/lizhi_2024/program/udw_dataset/data_pipe/export_underwater2/dataset_20250921_093929/dataset.yaml"
+YAML_PATH = "./data_pipe/export_underwater2/dataset_20250921_093929/dataset.yaml"
 IMAGE_ROOT = os.path.dirname(YAML_PATH)
 
 client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
