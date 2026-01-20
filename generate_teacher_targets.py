@@ -96,3 +96,4 @@ def generate_teacher_data():
 
 if __name__ == "__main__":
     generate_teacher_data()
+#TODO 先微调再进行教师图像生成 

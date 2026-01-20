@@ -1,0 +1,80 @@
+trainer: FluxKontext
+
+model:
+  pretrained_model_name_or_path: "black-forest-labs/FLUX.1-Kontext-dev"
+  quantize: False
+  lora:
+    r: 16  # LoRA rank, can be adjusted(8, 16, 32), larger r means more parameters
+    lora_alpha: 16  # LoRA alpha, usually equal to r
+    init_lora_weights: "gaussian"
+    target_modules: ["to_k", "to_q", "to_v", "to_out.0"]
+    # target_modules: "(.*x_embedder|.*transformer_blocks\\.[0-9]+\\.(norm|norm1)\\.linear|.*transformer_blocks\\.[0-9]+\\.attn\\.(to_k|to_q|to_v|to_add_out)|.*transformer_blocks\\.[0-9]+\\.attn\\.to_out\\.0|.*single_transformer_blocks\\.[0-9]+\\.attn\\.to_out|.*single_transformer_blocks\\.[0-9]+\\.(proj_mlp|proj_out)|.*(?<!single_)transformer_blocks\\.[0-9]+\\.ff\\.net\\.2|.*(?<!single_)transformer_blocks\\.[0-9]+\\.ff\\.net\\.0\\.proj|.*(?<!single_)transformer_blocks\\.[0-9]+\\.norm1_context\\.linear|.*(?<!single_)transformer_blocks\\.[0-9]+\\.ff_context\\.net\\.0\\.proj|.*(?<!single_)transformer_blocks\\.[0-9]+\\.ff_context\\.net\\.2|.*(?<!single_)transformer_blocks\\.[0-9]+\\.attn\\.(to_add_out|add_k_proj|add_q_proj|add_v_proj))"
+    pretrained_weight: null
+    adapter_name: "lora_edit"
+
+data:
+  class_path: "qflux.data.dataset.ImageDataset"
+  init_args:
+    dataset_path:
+      - split: train
+        repo_id: TsienDragon/face_segmentation_20
+    caption_dropout_rate: 0.05  # reduce caption dropout, because the task is relatively specialized
+    prompt_image_dropout_rate: 0.05
+    cache_dir: ${cache.cache_dir}
+    use_cache: ${cache.use_cache}
+    cache_drop_rate: 0.1  # 10% probability of using empty prompt for training
+    processor:
+      class_path: "qflux.data.preprocess.ImageProcessor"
+      init_args:
+        process_type: center_crop
+        target_size: [832, 576]
+        controls_size: [[832, 576]]
+  batch_size: 2  # adjust batch size according to the available memory, can be set to 1, 2, 4
+  num_workers: 2
+  shuffle: true
+
+logging:
+  output_dir: "/raid/lilong/data/experiment/flux-kontext-face_seg_lora_fp16/"  # change the path to your own output path
+  report_to: "tensorboard"
+  tracker_project_name: "face_segmentation_lora"
+
+optimizer:
+  class_path: bitsandbytes.optim.Adam8bit  # 8bit Adam optimizer to save memory
+  init_args:
+    lr: 0.0001  # face segmentation task uses smaller learning rate
+    betas: [0.9, 0.999]
+
+lr_scheduler:
+  scheduler_type: "cosine"  # cosine scheduler, better for fine-grained tasks
+  warmup_steps: 50  # increase warmup steps
+  num_cycles: 0.5
+  power: 1.0
+
+train:
+  gradient_accumulation_steps: 1  # increase gradient accumulation to simulate larger batch size
+  max_train_steps: 6000  # face segmentation data is small, reduce training steps
+  num_epochs: 400  # increase epoch number
+  checkpointing_steps: 100  # save checkpoints more frequently
+  checkpoints_total_limit: 20
+  max_grad_norm: 1.0
+  mixed_precision: "bf16"
+  gradient_checkpointing: True  # enable gradient checkpointing to save memory
+  low_memory: True
+
+cache:
+  devices:
+    vae: cuda:1
+    text_encoder: cuda:1
+    text_encoder_2: cuda:1
+  cache_dir: "/raid/lilong/data/experiment/flux-kontext-face_seg_lora_fp16_hf/cache"
+  use_cache: true
+  prompt_empty_drop_keys:
+    - empty_prompt_embeds
+    - empty_pooled_prompt_embeds
+
+predict:
+  devices:
+    vae: cuda:1
+    text_encoder: cuda:1 # CLIP
+    text_encoder_2: cuda:1  # T5
+    dit: cuda:1

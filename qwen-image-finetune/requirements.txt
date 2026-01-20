@@ -1,0 +1,48 @@
+safetensors
+# Note: For Qwen-Image-Edit-Plus (2509) support, you need to install the latest diffusers from GitHub:
+# pip install --upgrade "git+https://github.com/huggingface/diffusers.git"
+# Otherwise, use the version below:
+diffusers>=0.36.0
+transformers==4.52.4
+pyyaml
+oyaml
+tensorboardX
+einops
+accelerate
+pydantic
+omegaconf
+tqdm
+huggingface_hub
+opencv-python
+matplotlib==3.10.1
+setuptools==69.5.1
+peft
+tabulate
+psutil
+ipykernel
+# optimum
+optimum-quanto
+bitsandbytes
+transformer_engine[pytorch]
+packaging
+ninja
+wheel
+setuptools
+sentencepiece
+datasets
+prodigyopt
+pydantic==2.11.7
+blake3
+pillow
+rich
+pre-commit
+ruff
+mypy
+dotenv
+types-tabulate
+types-PyYAML
+typing-extensions
+# 日志工具
+wandb
+swanlab
+ImageHash

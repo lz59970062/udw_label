@@ -1,0 +1,52 @@
+model:
+  pretrained_model_name_or_path: black-forest-labs/FLUX.1-Kontext-dev
+  quantize: True
+  lora:
+    r: 16
+    lora_alpha: 16
+    init_lora_weights: "gaussian"
+    target_modules: ["to_k", "to_q", "to_v", "to_out.0"]
+    pretrained_weight: null
+    adapter_name: "lora_edit"
+
+data:
+  class_path: "qflux.data.dataset.ImageDataset"
+  init_args:
+    dataset_path: "/home/lizhi_2024/program/udw_dataset/dataset_labeled.yaml"
+    caption_dropout_rate: 0.1
+    prompt_image_dropout_rate: 0.1
+    use_edit_mask: false # Dataset doesn't have masks
+    # selected_control_indexes: [] # No extra controls
+    processor:
+      class_path: qflux.data.preprocess.ImageProcessor
+      init_args:
+        process_type: center_crop
+        resize_mode: bilinear
+        target_size: [832, 576]
+        controls_size: [[832, 576]]
+
+  batch_size: 1 # Safe starting point
+  num_workers: 2
+  shuffle: true
+
+logging:
+  output_dir: "/home/lizhi_2024/program/udw_dataset/output/"
+  report_to: "tensorboard"
+  tracker_project_name: "udw_finetune"
+  sampling:
+    enable: true
+    validation_steps: 100
+    num_samples: 1
+    seed: 42
+    validation_data: 
+      prompts:
+        - "Remove the thick, grayish-blue veil from the water to reveal the true clarity of the scene. Brighten the lighting."
+      # If validation_data is simple prompt list, it might generate from noise or need control?
+      # Usually validation needs control images for edit task. 
+      # Leaving null/basic for now or checking how validation works.
+
+optimizer:
+  class_path: bitsandbytes.optim.Adam8bit
+  init_args:
+    lr: 0.0001
+    betas: [0.9, 0.999]
