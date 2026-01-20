@@ -12,7 +12,7 @@ model:
 data:
   class_path: "qflux.data.dataset.ImageDataset"
   init_args:
-    dataset_path: "/home/lizhi_2024/program/udw_dataset/dataset_labeled.yaml"
+    dataset_path: "../dataset_labeled.yaml" 
     caption_dropout_rate: 0.1
     prompt_image_dropout_rate: 0.1
     use_edit_mask: false # Dataset doesn't have masks
@@ -30,7 +30,8 @@ data:
   shuffle: true
 
 logging:
-  output_dir: "/home/lizhi_2024/program/udw_dataset/output/"
+  output_dir: "../output/"
+  # output_dir: "/home/lizhi_2024/program/udw_dataset/output/"
   report_to: "tensorboard"
   tracker_project_name: "udw_finetune"
   sampling:

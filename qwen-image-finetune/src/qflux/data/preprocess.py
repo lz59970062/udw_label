@@ -150,8 +150,13 @@ def best_hw_given_area(
 
 
 class ImageProcessor:
-    def __init__(self, processor_config: ImageProcessorInitArgs):
-        self.processor_config = processor_config
+    def __init__(self, processor_config: ImageProcessorInitArgs | dict = None, **kwargs):
+        if processor_config is None:
+            processor_config = kwargs
+        if isinstance(processor_config, dict):
+             self.processor_config = ImageProcessorInitArgs(**processor_config)
+        else:
+             self.processor_config = processor_config
         self.devisible_by = 16
         self.resize_mode = self.processor_config.resize_mode
         if isinstance(self.resize_mode, str):

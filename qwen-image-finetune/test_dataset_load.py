@@ -30,6 +30,9 @@ class MockConfig:
         for k, v in dictionary.items():
             if k == "processor":
                 setattr(self, k, MockConfig(v))
+            elif k == "init_args" and isinstance(v, dict):
+                 # Convert init_args dict to object so instantiate_class calls constructor with object
+                 setattr(self, k, MockConfig(v))
             else:
                 setattr(self, k, v)
         # Default defaults
