@@ -5,11 +5,12 @@
 # config_file='tests/test_configs/test_example_fluxkontext_fp16_faceseg_multiresolution.yaml'
 # config_file='tests/test_configs/test_example_fluxkontext_multiresolution.yaml'
 # config_file='../tests/test_configs/test_example_fluxkontext_fp16.yaml'
-config_file='../tests/test_configs/test_example_qwen_image_edit_fp16.yaml'
+# config_file='../tests/test_configs/test_example_qwen_image_edit_fp16.yaml'
 # config_file='../tests/test_configs/test_example_qwen_image_edit_plus_fp16.yaml'
 # config_file='../tests/test_configs/test_example_qwen_image_edit_plus_fp4.yaml'
 # config_file='../tests/test_configs/test_example_qwen_image_edit_plus_fp4.yaml'
 # config_file='../tests/test_configs/test_dreamomni2_fp16.yaml'
+config_file='/configs/udw_finetune.yaml'
 echo "Used config file: $config_file"
 
 cd src/

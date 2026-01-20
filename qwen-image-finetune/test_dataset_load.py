@@ -42,6 +42,12 @@ class MockConfig:
         if not hasattr(self, "prompt_empty_drop_keys"): self.prompt_empty_drop_keys = []
         if not hasattr(self, "caption_dropout_rate"): self.caption_dropout_rate = 0.0
 
+        # Defaults for processor config
+        if not hasattr(self, "target_pixels"): self.target_pixels = None
+        if not hasattr(self, "controls_pixels"): self.controls_pixels = None
+        if not hasattr(self, "multi_resolutions"): self.multi_resolutions = None
+        if not hasattr(self, "max_aspect_ratio"): self.max_aspect_ratio = None
+
 dataset_config_obj = MockConfig(data_config)
 
 print("Initializing ImageDataset...")
